@@ -235,6 +235,7 @@
 #include "debug.h"
 #endif
 #include "statemanager.h"
+#include "user_code.h"
 
 #ifdef NETPLAY_SUPPORT
 #ifdef _DEBUG
@@ -1974,6 +1975,9 @@ int main (int argc, char **argv)
 		if (!Settings.Paused)
 	#endif
 			S9xSetSoundMute(FALSE);
+
+	  // TODO: Work in progress
+	  S9xRunUserDefinedExtraCode();
 	}
 
 	return (0);
