@@ -248,4 +248,7 @@ void S9xInitInputDevices (void);
 void S9xProcessEvents (bool8);
 const char * S9xSelectFilename (const char *, const char *, const char *, const char *);
 
+// HACKED functions for user_code module
+void* HACK_S9xGetCurrentImage();
+
 #endif

@@ -1940,3 +1940,8 @@ void S9xSetPalette (void)
 {
 	return;
 }
+
+void* HACK_S9xGetCurrentImage()
+{
+  return (void*)GUI.image;
+}
