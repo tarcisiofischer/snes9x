@@ -376,3 +376,11 @@ __pycache__/
 *.xsd.cs
 
 # End of https://www.gitignore.io/api/c,c++,visualstudio
+
+.project
+*.ppm
+snes9x
+Makefile
+config.info
+config.status
+
