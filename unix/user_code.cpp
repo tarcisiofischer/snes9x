@@ -23,40 +23,56 @@ struct Image
 
 
 static bool loop_state = false;
+// LEFT, RIGHT, UP, DOWN, JUMP
+static int codes[] = {113, 114, 0, 0, 54};
+static int snapshot_rate = 0;
 
 void S9xRunUserDefinedExtraCode()
 {
-    // Keep pressing <enter> forever
-    int ENTER_CODE = 36;
-    S9xReportButton(ENTER_CODE, loop_state);
     loop_state = !loop_state;
+
+    FILE *action_f = fopen("/tmp/action.txt", "r");
+    if (action_f) {
+        char buff[10];
+        fgets(buff, 10, action_f);
+        fclose(action_f);
+
+	for (int i = 0; i < 5; ++i) {
+            if (buff[i] == '1') {
+                S9xReportButton(codes[i], loop_state);
+            }
+        }
+    }
 
     // A very ugly way to get the current image. Will only work when dealing with
     // x11 based unix compilations...
     //
-    Image* image = (Image*)HACK_S9xGetCurrentImage();
-    int bytes_per_pixel = image->bits_per_pixel / 8;
-    int width = image->bytes_per_line / bytes_per_pixel;
-    int height = image->height;
+    snapshot_rate++;
+    std::cout << snapshot_rate << "\n";
+    if (snapshot_rate > 5) {
+    	Image* image = (Image*)HACK_S9xGetCurrentImage();
+    	int bytes_per_pixel = image->bits_per_pixel / 8;
+    	int width = image->bytes_per_line / bytes_per_pixel;
+    	int height = image->height;
 
-    std::cout << width << "x" << height << "\n";
-    FILE *f = fopen("out.ppm", "wb");
-    fprintf(f, "P6\n%i %i 255\n", width, height);
-    for (int y = 0; y < height; ++y) {
-        for (int x = 0; x < width; ++x) {
-            int line_index = y * width * bytes_per_pixel;
-            int column_index = x * bytes_per_pixel;
-            int index = line_index + column_index;
+    	FILE *f = fopen("/tmp/snapshot.ppm", "wb");
+    	fprintf(f, "P6\n%i %i 255\n", width, height);
+    	for (int y = 0; y < height; ++y) {
+    	    for (int x = 0; x < width; ++x) {
+    	        int line_index = y * width * bytes_per_pixel;
+    	        int column_index = x * bytes_per_pixel;
+    	        int index = line_index + column_index;
 
-            char red = image->data[index + 0];
-            char green = image->data[index + 1];
-            char blue = image->data[index + 2];
+    	        char red = image->data[index + 2];
+    	        char green = image->data[index + 1];
+    	        char blue = image->data[index + 0];
 
-            fputc(red, f);
-            fputc(green, f);
-            fputc(blue, f);
-        }
+    	        fputc(red, f);
+    	        fputc(green, f);
+    	        fputc(blue, f);
+    	    }
+    	}
+    	fclose(f);
+        snapshot_rate = 0;
     }
-    fclose(f);
-
 }
